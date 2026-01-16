@@ -61,7 +61,7 @@ Environment variables control the server behavior.
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `PORT` | API server port. | `8080` |
-| `GOOGLE_CLOUD_PROJECT` | GCP Project ID. Required for Firestore access. | - |
+| `GOOGLE_CLOUD_PROJECT` | GCP Project ID. Required for Firestore access. | Auto-detected on Cloud Run (optional). Required for local dev. |
 | `ALLOWED_ORIGIN` | Allowed CORS origin. | `*` (if unset/non-local) |
 
 ### Cloud Run
@@ -72,13 +72,12 @@ Deploy the service using the standard `gcloud` workflow.
     Substitutes local environment variables and allows unauthenticated access for demonstration.
 
     ```bash
-    export GOOGLE_CLOUD_PROJECT=your-project-id
     export REGION=us-central1
 
     gcloud run deploy todo-app \
       --source . \
       --region $REGION \
-      --set-env-vars GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT \
+      --labels dev-tutorial=flutter-cloud-run \
       --allow-unauthenticated
     ```
 
