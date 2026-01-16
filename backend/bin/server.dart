@@ -7,6 +7,7 @@ import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
+import 'package:shared/shared.dart';
 
 void _log(String level, String message,
     {Object? error, StackTrace? stack, Map<String, dynamic>? extra}) {

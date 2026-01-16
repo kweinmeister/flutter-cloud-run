@@ -90,12 +90,11 @@ class TodoRepository {
     final fields = toFirestoreFields({
       'title': item.title,
       'isDone': item.isDone,
-      'created_at': item.createdAt,
     });
     await _api.projects.databases.documents.patch(
       Document(fields: fields),
       '$_collectionPath/${item.id}',
-      updateMask_fieldPaths: ['title', 'isDone', 'created_at'],
+      updateMask_fieldPaths: ['title', 'isDone'],
     );
   }
 

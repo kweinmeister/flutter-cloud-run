@@ -17,6 +17,10 @@ class TodosResponse {
 /// - Release mode: Uses same-origin (served from backend)
 /// - Debug mode: Uses [ApiConstants.localBackendUrl] (http://localhost:8080)
 class TodoClient {
+  final http.Client _client;
+
+  TodoClient({http.Client? client}) : _client = client ?? http.Client();
+
   String get _baseUrl {
     if (kReleaseMode) return '';
     return ApiConstants.localBackendUrl;
@@ -49,7 +53,7 @@ class TodoClient {
       if (pageToken != null) {
         uri = uri.replace(queryParameters: {'pageToken': pageToken});
       }
-      return http.get(uri);
+      return _client.get(uri);
     },
     (json) {
       final data = json as Map<String, dynamic>;
@@ -66,7 +70,7 @@ class TodoClient {
   /// The server will generate the ID and timestamp, ignoring client values.
   /// Returns the created [TodoItem] with server-assigned ID.
   Future<TodoItem> createTodo(TodoItem item) => _request(
-    () => http.post(
+    () => _client.post(
       _baseUri,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(item.toJson()),
@@ -78,7 +82,7 @@ class TodoClient {
   ///
   /// The [item.id] must match an existing todo.
   Future<void> updateTodo(TodoItem item) => _request(
-    () => http.patch(
+    () => _client.patch(
       Uri.parse('$_baseUri/${item.id}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(item.toJson()),
@@ -88,5 +92,5 @@ class TodoClient {
 
   /// Deletes a todo item by ID.
   Future<void> deleteTodo(String id) =>
-      _request(() => http.delete(Uri.parse('$_baseUri/$id')), (_) {});
+      _request(() => _client.delete(Uri.parse('$_baseUri/$id')), (_) {});
 }

@@ -187,7 +187,7 @@ Middleware _contentTypeGuard() {
           request.method == 'PATCH' ||
           request.method == 'PUT') {
         final contentType = request.headers['content-type'];
-        if (request.url.path.startsWith('api/')) {
+        if (request.url.path.startsWith('/api/')) {
           if (contentType == null ||
               !contentType.contains('application/json')) {
             return _errorResponse(

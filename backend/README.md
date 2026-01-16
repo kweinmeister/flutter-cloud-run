@@ -36,7 +36,7 @@ The server listens on port `8080` by default.
 
 ### API Endpoints
 
-- `GET /api/v1/todos`: List all todos.
-- `POST /api/v1/todos`: Create a new todo.
-- `PATCH /api/v1/todos/<id>`: Update a todo.
-- `DELETE /api/v1/todos/<id>`: Delete a todo.
+- `GET /api/todos`: List all todos.
+- `POST /api/todos`: Create a new todo.
+- `PATCH /api/todos/<id>`: Update a todo.
+- `DELETE /api/todos/<id>`: Delete a todo.

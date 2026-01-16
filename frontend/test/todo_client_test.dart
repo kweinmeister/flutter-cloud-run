@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared/shared.dart';
 import 'package:frontend/todo_client.dart';
 
@@ -29,4 +30,32 @@ void main() {
       });
     });
   });
+
+
+  group('TodoClient Integration', () {
+    test('fetchTodos uses injected client', () async {
+      final client = MockClient((request) async {
+        return http.Response('{"items": [], "nextPageToken": null}', 200);
+      });
+      final todoClient = TodoClient(client: client);
+      final response = await todoClient.fetchTodos();
+      expect(response.items, isEmpty);
+    });
+  });
+}
+
+class MockClient extends http.BaseClient {
+  final Future<http.Response> Function(http.Request request) _handler;
+  MockClient(this._handler);
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    final response = await _handler(request as http.Request);
+    return http.StreamedResponse(
+      Stream.fromIterable([response.bodyBytes]),
+      response.statusCode,
+      contentLength: response.contentLength,
+      request: request,
+      headers: response.headers,
+    );
+  }
 }

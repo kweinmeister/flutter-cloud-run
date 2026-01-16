@@ -8,6 +8,7 @@ WORKDIR /app
 # Copy dependency files only to cache layers
 COPY shared/pubspec.yaml shared/
 COPY frontend/pubspec.yaml frontend/pubspec.lock frontend/
+COPY shared/ /app/shared/
 
 WORKDIR /app/frontend
 # Remove local lockfile (generated on Mac) to use pure Linux resolution
@@ -15,7 +16,6 @@ RUN rm -f pubspec.lock
 RUN flutter pub get
 
 # Copy source code
-COPY shared/ /app/shared/
 COPY frontend/ .
 
 # Build for web
@@ -31,12 +31,13 @@ WORKDIR /app
 # Copy dependency files only to cache layers
 COPY shared/pubspec.yaml shared/
 COPY backend/pubspec.yaml backend/pubspec.lock backend/
+COPY shared/ /app/shared/
 
 WORKDIR /app/backend
+RUN rm -f pubspec.lock
 RUN dart pub get
 
 # Copy source code
-COPY shared/ /app/shared/
 COPY backend/ .
 
 # Build server to executable (AOT)
