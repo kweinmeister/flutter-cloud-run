@@ -47,6 +47,9 @@ void main(List<String> args) async {
       );
       exit(1);
     }
+
+    final firestoreApi = FirestoreApi(client);
+
     late final String projectId;
     try {
       projectId = await computeProjectId();
@@ -61,7 +64,6 @@ void main(List<String> args) async {
       exit(1);
     }
 
-    final firestoreApi = FirestoreApi(client);
     final repo = TodoRepository(firestoreApi, projectId);
 
     // Serve static files from /app/public (Docker) or ../frontend/build/web (Local)
