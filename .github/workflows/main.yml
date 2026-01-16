@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Uses subosito/flutter-action to enable support for both
+      # standard Dart packages (backend) and Flutter packages (frontend)
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap Workspace
+        run: melos bootstrap
+
+      - name: Check Formatting
+        run: melos run format:check --no-select
+
+      - name: Analyze
+        run: melos run analyze --no-select
+
+      - name: Run Tests
+        # Runs both test:dart (backend/shared) and test:flutter (frontend)
+        run: melos run test --no-select

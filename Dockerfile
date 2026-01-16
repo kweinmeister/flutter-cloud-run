@@ -6,7 +6,6 @@ FROM ghcr.io/cirruslabs/flutter:stable AS flutter-builder
 WORKDIR /app
 
 # Copy dependency files only to cache layers
-COPY shared/pubspec.yaml shared/
 COPY frontend/pubspec.yaml frontend/pubspec.lock frontend/
 COPY shared/ /app/shared/
 
@@ -29,7 +28,6 @@ FROM dart:stable AS backend-builder
 WORKDIR /app
 
 # Copy dependency files only to cache layers
-COPY shared/pubspec.yaml shared/
 COPY backend/pubspec.yaml backend/pubspec.lock backend/
 COPY shared/ /app/shared/
 

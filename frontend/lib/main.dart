@@ -122,10 +122,11 @@ class _TodoListPageState extends State<TodoListPage> {
     }
   }
 
-  Future<void> _runOptimistic({
+  Future<void> _runOptimistic<T>({
     required VoidCallback action,
     required VoidCallback rollback,
-    required Future<void> Function() apiCall,
+    required Future<T> Function() apiCall,
+    void Function(T result)? onSuccess,
     required String errorMessage,
   }) async {
     if (!mounted) return;
@@ -135,10 +136,15 @@ class _TodoListPageState extends State<TodoListPage> {
 
     try {
       // 2. Network Request
-      await apiCall();
+      final T result = await apiCall();
+      if (!mounted) return;
+      // 3. Update state on success
+      if (onSuccess != null) {
+        setState(() => onSuccess(result));
+      }
     } catch (e) {
       if (!mounted) return;
-      // 3. Rollback on failure
+      // 4. Rollback on failure
       setState(rollback);
       context.showError(errorMessage);
     }
@@ -156,20 +162,17 @@ class _TodoListPageState extends State<TodoListPage> {
       createdAt: DateTime.now(),
     );
 
-    await _runOptimistic(
+    await _runOptimistic<TodoItem>(
       action: () => _todos.add(newItem),
       rollback: () {
         _todos.remove(newItem);
         _isProcessing = false;
       },
-      apiCall: () async {
-        final created = await _client.createTodo(newItem);
-        if (!mounted) return;
-        setState(() {
-          final index = _todos.indexWhere((t) => t.id == newItem.id);
-          if (index != -1) _todos[index] = created;
-          _isProcessing = false;
-        });
+      apiCall: () => _client.createTodo(newItem),
+      onSuccess: (created) {
+        final index = _todos.indexWhere((t) => t.id == newItem.id);
+        if (index != -1) _todos[index] = created;
+        _isProcessing = false;
       },
       errorMessage: 'Could not add task',
     );
@@ -178,7 +181,7 @@ class _TodoListPageState extends State<TodoListPage> {
   void _updateTodo(TodoItem item, {String? title, bool? isDone}) async {
     final updated = item.copyWith(title: title, isDone: isDone);
 
-    await _runOptimistic(
+    await _runOptimistic<void>(
       action: () {
         final index = _todos.indexWhere((t) => t.id == item.id);
         if (index != -1) _todos[index] = updated;
@@ -196,7 +199,7 @@ class _TodoListPageState extends State<TodoListPage> {
     final original = _todos.firstWhere((t) => t.id == id);
     final index = _todos.indexOf(original);
 
-    await _runOptimistic(
+    await _runOptimistic<void>(
       action: () => _todos.removeAt(index),
       rollback: () => _todos.insert(index, original),
       apiCall: () => _client.deleteTodo(id),

@@ -15,6 +15,10 @@ scripts:
     run: dart run melos exec -- "dart format ."
     description: Format all packages.
 
+  format:check:
+    run: dart run melos exec -- "dart format . --set-exit-if-changed --output=none"
+    description: Check formatting of all packages.
+
   test:
     run: dart run melos run test:dart && dart run melos run test:flutter
     description: Run all tests in the workspace.

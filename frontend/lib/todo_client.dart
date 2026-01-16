@@ -28,17 +28,25 @@ class TodoClient {
 
   Uri get _baseUri => Uri.parse('$_baseUrl${ApiConstants.todosPath}');
 
-  Future<T> _request<T>(
+  Future<T> _requestJson<T>(
     Future<http.Response> Function() call,
-    T Function(dynamic) mapper,
+    T Function(dynamic json) fromJson,
   ) async {
     final response = await call().timeout(
-      Duration(seconds: UiConstants.requestTimeoutSeconds),
+      const Duration(seconds: UiConstants.requestTimeoutSeconds),
     );
-    if (response.statusCode == 200) {
-      final bodyText = response.body;
-      if (bodyText.isEmpty || bodyText == 'null') return mapper(null);
-      return mapper(jsonDecode(bodyText));
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Request failed: ${response.statusCode}');
+  }
+
+  Future<void> _requestVoid(Future<http.Response> Function() call) async {
+    final response = await call().timeout(
+      const Duration(seconds: UiConstants.requestTimeoutSeconds),
+    );
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return;
     }
     throw Exception('Request failed: ${response.statusCode}');
   }
@@ -47,7 +55,7 @@ class TodoClient {
   ///
   /// Pass [pageToken] to fetch the next page of results.
   /// Returns [TodosResponse] containing items and optional next page token.
-  Future<TodosResponse> fetchTodos({String? pageToken}) => _request(
+  Future<TodosResponse> fetchTodos({String? pageToken}) => _requestJson(
     () {
       var uri = _baseUri;
       if (pageToken != null) {
@@ -69,7 +77,7 @@ class TodoClient {
   ///
   /// The server will generate the ID and timestamp, ignoring client values.
   /// Returns the created [TodoItem] with server-assigned ID.
-  Future<TodoItem> createTodo(TodoItem item) => _request(
+  Future<TodoItem> createTodo(TodoItem item) => _requestJson(
     () => _client.post(
       _baseUri,
       headers: {'Content-Type': 'application/json'},
@@ -81,16 +89,15 @@ class TodoClient {
   /// Updates an existing todo item.
   ///
   /// The [item.id] must match an existing todo.
-  Future<void> updateTodo(TodoItem item) => _request(
+  Future<void> updateTodo(TodoItem item) => _requestVoid(
     () => _client.patch(
       Uri.parse('$_baseUri/${item.id}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(item.toJson()),
     ),
-    (_) {},
   );
 
   /// Deletes a todo item by ID.
   Future<void> deleteTodo(String id) =>
-      _request(() => _client.delete(Uri.parse('$_baseUri/$id')), (_) {});
+      _requestVoid(() => _client.delete(Uri.parse('$_baseUri/$id')));
 }
