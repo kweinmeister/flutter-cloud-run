@@ -151,15 +151,25 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   void _addTodo() async {
-    if (_controller.text.isEmpty || _isProcessing) return;
-    final text = _controller.text;
+    if (_isProcessing) return;
+
+    final tempItem = TodoItem(
+      id: 'temp',
+      title: _controller.text,
+      createdAt: DateTime.now(),
+    );
+    final validationError = tempItem.validate();
+    if (validationError != null) {
+      context.showError(validationError);
+      return;
+    }
+
     _controller.clear();
     setState(() => _isProcessing = true);
 
-    final newItem = TodoItem(
+    final newItem = tempItem.copyWith(
       id: _uuid.v4(),
-      title: text,
-      createdAt: DateTime.now(),
+      title: tempItem.sanitizedTitle, // Use sanitized title
     );
 
     await _runOptimistic<TodoItem>(
@@ -180,6 +190,14 @@ class _TodoListPageState extends State<TodoListPage> {
 
   void _updateTodo(TodoItem item, {String? title, bool? isDone}) async {
     final updated = item.copyWith(title: title, isDone: isDone);
+
+    if (title != null) {
+      final error = updated.validate();
+      if (error != null) {
+        context.showError(error);
+        return;
+      }
+    }
 
     await _runOptimistic<void>(
       action: () {

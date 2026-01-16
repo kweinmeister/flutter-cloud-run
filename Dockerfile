@@ -47,20 +47,21 @@ RUN dart compile exe bin/server.dart -o bin/server
 FROM scratch
 
 # Need CA certificates for outbound SSL (Firestore) and /tmp for temp files
-# Using cc-debian12 for Dart AOT shared libs (libc, libm, libz)
-COPY --from=gcr.io/distroless/cc-debian12 / /
+# Using cc-debian13 for Dart AOT shared libs (libc, libm, libz)
+COPY --from=gcr.io/distroless/cc-debian13 / /
 
 WORKDIR /app
 
 # Copy the compiled server
-COPY --from=backend-builder /app/backend/bin/server /app/server
+COPY --from=backend-builder --chown=nonroot:nonroot /app/backend/bin/server /app/server
 
 # Copy the Flutter Web assets
 # We place them in a specific folder that the server will serve (e.g., /public)
-COPY --from=flutter-builder /app/frontend/build/web /app/public
+COPY --from=flutter-builder --chown=nonroot:nonroot /app/frontend/build/web /app/public
 
 # Environment variables
 ENV PORT=8080
 
-# Start server
+# Start server as non-root user
+USER nonroot
 CMD ["/app/server"]

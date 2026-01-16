@@ -18,6 +18,11 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
+          # Cache the Flutter SDK and dependencies based on lockfiles
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
+          # Use explicit hash of all lockfiles for monorepo support
+          pub-cache-key: "flutter-pub-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}-:channel:-:version:"
           
       - name: Install Melos
         run: dart pub global activate melos
