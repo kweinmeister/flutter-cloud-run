@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:backend/repository.dart';
 import 'package:backend/src/app.dart';
+import 'package:google_cloud/google_cloud.dart';
 import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:shelf/shelf.dart';
@@ -46,17 +47,21 @@ void main(List<String> args) async {
       );
       exit(1);
     }
-    final firestoreApi = FirestoreApi(client);
-    final projectId = Platform.environment['GOOGLE_CLOUD_PROJECT'];
-
-    if (projectId == null || projectId.isEmpty) {
+    late final String projectId;
+    try {
+      projectId = await computeProjectId();
+    } catch (e) {
       _log(
         LogLevel.critical,
-        'GOOGLE_CLOUD_PROJECT environment variable is NOT set. Failing fast.',
+        'Failed to detect Google Cloud Project ID. '
+        'Ensure GOOGLE_CLOUD_PROJECT environment variable is set locally, '
+        'or that the service account has access to the Metadata Server on Cloud Run.',
+        error: e,
       );
       exit(1);
     }
 
+    final firestoreApi = FirestoreApi(client);
     final repo = TodoRepository(firestoreApi, projectId);
 
     // Serve static files from /app/public (Docker) or ../frontend/build/web (Local)
