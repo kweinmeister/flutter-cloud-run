@@ -1,0 +1,54 @@
+# Dart & Flutter
+.dart_tool/
+.pub-cache/
+.pub/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+**/doc/api/
+*.log
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+.atom/
+.history
+
+# Secrets & Environment
+*.env
+.env.*
+service-account.json
+*-credentials.json
+
+# Docker & OS
+*.tar
+.dockerignore
+.DS_Store
+Thumbs.db
+
+# Testing & Artifacts
+coverage/
+*.lcov
+*.exe
+*.so
+*.dylib
+*.dll
+
+# App Specific Build/Debug Artifacts
+backend/bin/server
+backend/server
+/android/app/debug
+/android/app/release
+/android/app/profile
+app.*.symbols
+app.*.map.json
+
+# Melos
+.melos_tool/
