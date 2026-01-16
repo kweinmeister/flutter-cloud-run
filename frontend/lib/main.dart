@@ -180,15 +180,21 @@ class _TodoListPageState extends State<TodoListPage> {
     );
 
     await _runOptimistic<TodoItem>(
-      action: () => _todos.add(newItem),
+      action: () {
+        _state = TodoData([..._todos, newItem], nextPageToken: _nextPageToken);
+      },
       rollback: () {
-        _todos.remove(newItem);
+        final newList = _todos.where((t) => t.id != newItem.id).toList();
+        _state = TodoData(newList, nextPageToken: _nextPageToken);
         _isProcessing = false;
       },
       apiCall: () => _client.createTodo(newItem),
       onSuccess: (created) {
-        final index = _todos.indexWhere((t) => t.id == newItem.id);
-        if (index != -1) _todos[index] = created;
+        final newList = [
+          for (final t in _todos)
+            if (t.id == newItem.id) created else t,
+        ];
+        _state = TodoData(newList, nextPageToken: _nextPageToken);
         _isProcessing = false;
       },
       errorMessage: 'Could not add task',
@@ -208,12 +214,18 @@ class _TodoListPageState extends State<TodoListPage> {
 
     await _runOptimistic<void>(
       action: () {
-        final index = _todos.indexWhere((t) => t.id == item.id);
-        if (index != -1) _todos[index] = updated;
+        final newList = [
+          for (final t in _todos)
+            if (t.id == item.id) updated else t,
+        ];
+        _state = TodoData(newList, nextPageToken: _nextPageToken);
       },
       rollback: () {
-        final index = _todos.indexWhere((t) => t.id == item.id);
-        if (index != -1) _todos[index] = item;
+        final newList = [
+          for (final t in _todos)
+            if (t.id == item.id) item else t,
+        ];
+        _state = TodoData(newList, nextPageToken: _nextPageToken);
       },
       apiCall: () => _client.updateTodo(updated),
       errorMessage: 'Failed to update task',
@@ -225,8 +237,19 @@ class _TodoListPageState extends State<TodoListPage> {
     final index = _todos.indexOf(original);
 
     await _runOptimistic<void>(
-      action: () => _todos.removeAt(index),
-      rollback: () => _todos.insert(index, original),
+      action: () {
+        final newList = _todos.where((t) => t.id != id).toList();
+        _state = TodoData(newList, nextPageToken: _nextPageToken);
+      },
+      rollback: () {
+        final newList = [..._todos];
+        if (index >= 0 && index <= newList.length) {
+          newList.insert(index, original);
+        } else {
+          newList.add(original);
+        }
+        _state = TodoData(newList, nextPageToken: _nextPageToken);
+      },
       apiCall: () => _client.deleteTodo(id),
       errorMessage: 'Failed to delete task',
     );

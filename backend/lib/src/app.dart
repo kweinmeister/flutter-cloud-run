@@ -165,6 +165,7 @@ Middleware _corsMiddleware() {
       final response = await innerHandler(updatedRequest);
       return response.change(
         headers: {
+          ...response.headers,
           'Access-Control-Allow-Origin': allowedOrigin,
           'Access-Control-Allow-Methods': corsAllowMethods,
           'Access-Control-Allow-Headers': corsAllowHeaders,
