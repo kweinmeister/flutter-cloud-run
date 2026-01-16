@@ -66,6 +66,7 @@ class TodoListPage extends StatefulWidget {
 
 class _TodoListPageState extends State<TodoListPage> {
   final _client = TodoClient();
+  final _uuid = const Uuid();
   TodoState _state = TodoLoading();
   final TextEditingController _controller = TextEditingController();
   bool _isLoadingMore = false;
@@ -150,7 +151,7 @@ class _TodoListPageState extends State<TodoListPage> {
     setState(() => _isProcessing = true);
 
     final newItem = TodoItem(
-      id: const Uuid().v4(),
+      id: _uuid.v4(),
       title: text,
       createdAt: DateTime.now(),
     );

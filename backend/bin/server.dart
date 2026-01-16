@@ -9,8 +9,13 @@ import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 import 'package:shared/shared.dart';
 
-void _log(String level, String message,
-    {Object? error, StackTrace? stack, Map<String, dynamic>? extra}) {
+void _log(
+  String level,
+  String message, {
+  Object? error,
+  StackTrace? stack,
+  Map<String, dynamic>? extra,
+}) {
   final entry = {
     'severity': level,
     'message': message,
@@ -28,21 +33,24 @@ void main(List<String> args) async {
   // Initialize Auth & Repository
   late final AutoRefreshingAuthClient client;
   try {
-    client = await clientViaApplicationDefaultCredentials(scopes: [
-      FirestoreApi.datastoreScope,
-    ]);
+    client = await clientViaApplicationDefaultCredentials(
+      scopes: [FirestoreApi.datastoreScope],
+    );
   } catch (e) {
-    _log('CRITICAL',
-        'Failed to obtain credentials. For local development, run: gcloud auth application-default login');
+    _log(
+      'CRITICAL',
+      'Failed to obtain credentials. For local development, run: gcloud auth application-default login',
+    );
     exit(1);
   }
   final firestoreApi = FirestoreApi(client);
+  final projectId = Platform.environment['GOOGLE_CLOUD_PROJECT'];
 
-  final projectId = Platform.environment['GOOGLE_CLOUD_PROJECT'] ??
-      Platform.environment['PROJECT_ID'];
   if (projectId == null || projectId.isEmpty) {
-    _log('CRITICAL',
-        'GOOGLE_CLOUD_PROJECT environment variable is NOT set. Failing fast.');
+    _log(
+      'CRITICAL',
+      'GOOGLE_CLOUD_PROJECT environment variable is NOT set. Failing fast.',
+    );
     exit(1);
   }
 

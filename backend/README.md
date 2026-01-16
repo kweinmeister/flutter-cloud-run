@@ -28,11 +28,11 @@ The server listens on port `8080` by default.
 
 ### Environment Variables
 
-| Variable | Description |
-| :--- | :--- |
-| `PORT` | Port to listen on (default: 8080). |
-| `ALLOWED_ORIGIN` | Allowed origin for CORS headers (e.g., `http://localhost:8080`). Default accommodates typical local dev. |
-| `GOOGLE_CLOUD_PROJECT` | Google Cloud Project ID for Firestore access. Auto-detected in Cloud Run. |
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `PORT` | Port to listen on. | `8080` |
+| `ALLOWED_ORIGIN` | Allowed origin for CORS headers. | `*` (or reflecting `localhost` in dev) |
+| `GOOGLE_CLOUD_PROJECT` | Google Cloud Project ID for Firestore access. | Auto-detected in Cloud Run. |
 
 ### API Endpoints
 

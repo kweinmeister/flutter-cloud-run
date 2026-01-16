@@ -63,12 +63,14 @@ Future<Response> _createTodo(Request req, TodoRepository repo) async {
   return _jsonResponse(created.toJson());
 }
 
-Future<Response> _deleteTodo(Request req, String id, TodoRepository repo) async {
+Future<Response> _deleteTodo(
+    Request req, String id, TodoRepository repo) async {
   await repo.deleteTodo(id);
   return Response.ok(null);
 }
 
-Future<Response> _updateTodo(Request req, String id, TodoRepository repo) async {
+Future<Response> _updateTodo(
+    Request req, String id, TodoRepository repo) async {
   final item = await _parseAndValidateBody(req, matchId: id);
   await repo.updateTodo(item.copyWith(id: id));
   return Response.ok(null);
@@ -127,31 +129,37 @@ Middleware _corsMiddleware() {
     return '*';
   }
 
-  return createMiddleware(
-    requestHandler: (request) {
+  return (innerHandler) {
+    return (request) async {
       final requestOrigin = request.headers['origin'];
       final allowedOrigin = determineAllowedOrigin(requestOrigin);
 
-      final corsHeaders = {
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Methods': corsAllowMethods,
-        'Access-Control-Allow-Headers': corsAllowHeaders,
-      };
-
       if (request.method == 'OPTIONS') {
-        return Response.ok('', headers: corsHeaders);
+        return Response.ok(
+          '',
+          headers: {
+            'Access-Control-Allow-Origin': allowedOrigin,
+            'Access-Control-Allow-Methods': corsAllowMethods,
+            'Access-Control-Allow-Headers': corsAllowHeaders,
+          },
+        );
       }
-      return null;
-    },
-    responseHandler: (response) {
-      final allowedOrigin = determineAllowedOrigin(null);
+
+      final updatedRequest = request.change(
+        context: {'cors.origin': allowedOrigin},
+      );
+      final response = await innerHandler(updatedRequest);
+
+      final finalAllowedOrigin = response.context['cors.origin'] as String? ??
+          determineAllowedOrigin(null);
+
       return response.change(headers: {
-        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Origin': finalAllowedOrigin,
         'Access-Control-Allow-Methods': corsAllowMethods,
         'Access-Control-Allow-Headers': corsAllowHeaders,
       });
-    },
-  );
+    };
+  };
 }
 
 Middleware _staticCacheMiddleware() {

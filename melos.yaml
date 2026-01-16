@@ -11,6 +11,10 @@ scripts:
     run: dart run melos exec -- "dart analyze ."
     description: Run `dart analyze` in all packages.
 
+  format:
+    run: dart run melos exec -- "dart format ."
+    description: Format all packages.
+
   test:
     run: dart run melos run test:dart && dart run melos run test:flutter
     description: Run all tests in the workspace.
