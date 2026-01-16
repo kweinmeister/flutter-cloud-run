@@ -1,0 +1,27 @@
+# .gcloudignore
+# This file specifies which files should NOT be uploaded to Google Cloud 
+# during a 'gcloud run deploy' or 'gcloud builds submit'.
+
+# Include gitignore rules
+#!include:.gitignore
+
+# Cloud Run specific ignores
+.git/
+.github/
+
+# Ignore local build artifacts to speed up upload
+**/build/
+**/coverage/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Ignore IDE settings
+.idea/
+.vscode/
+
+# Ignore OS junk
+.DS_Store
