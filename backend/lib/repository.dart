@@ -30,8 +30,9 @@ class TodoRepository {
   ///   final moreItems = await repo.listTodos(pageToken: nextPageToken);
   /// }
   /// ```
-  Future<({List<TodoItem> items, String? nextPageToken})> listTodos(
-      {String? pageToken}) async {
+  Future<({List<TodoItem> items, String? nextPageToken})> listTodos({
+    String? pageToken,
+  }) async {
     final response = await _api.projects.databases.documents.list(
       _parentPath,
       'todos',

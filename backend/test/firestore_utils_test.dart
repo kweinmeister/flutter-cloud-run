@@ -54,10 +54,7 @@ void main() {
     });
 
     test('toPlainMap handles null values', () {
-      final firestoreMap = {
-        'null': Value(),
-        'str': Value(stringValue: 'test'),
-      };
+      final firestoreMap = {'null': Value(), 'str': Value(stringValue: 'test')};
 
       final plainMap = firestoreMap.toPlainMap();
 
@@ -125,11 +122,7 @@ void main() {
     });
 
     test('roundtrip conversion preserves data', () {
-      final original = {
-        'name': 'John',
-        'age': 30,
-        'active': true,
-      };
+      final original = {'name': 'John', 'age': 30, 'active': true};
 
       final firestoreFields = toFirestoreFields(original);
       final converted = firestoreFields.toPlainMap();

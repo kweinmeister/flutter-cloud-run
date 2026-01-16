@@ -8,6 +8,7 @@ class ApiConstants {
   // Local development default
   static const int defaultPort = 8080;
   static const String localBackendUrl = 'http://localhost:$defaultPort';
+  static const int maxBodySizeBytes = 100000;
 }
 
 // UI Constants for Frontend

@@ -21,6 +21,9 @@ class TodoClient {
 
   TodoClient({http.Client? client}) : _client = client ?? http.Client();
 
+  /// Closes the underlying HTTP client.
+  void close() => _client.close();
+
   String get _baseUrl {
     if (kReleaseMode) return '';
     return ApiConstants.localBackendUrl;
@@ -38,7 +41,15 @@ class TodoClient {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return fromJson(jsonDecode(response.body));
     }
-    throw Exception('Request failed: ${response.statusCode}');
+
+    try {
+      final errorBody = jsonDecode(response.body) as Map<String, dynamic>;
+      final errorMessage =
+          (errorBody['error'] as Map<String, dynamic>)['message'] as String;
+      throw Exception('Request failed: $errorMessage');
+    } catch (_) {
+      throw Exception('Request failed: ${response.statusCode}');
+    }
   }
 
   Future<void> _requestVoid(Future<http.Response> Function() call) async {
@@ -48,7 +59,15 @@ class TodoClient {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return;
     }
-    throw Exception('Request failed: ${response.statusCode}');
+
+    try {
+      final errorBody = jsonDecode(response.body) as Map<String, dynamic>;
+      final errorMessage =
+          (errorBody['error'] as Map<String, dynamic>)['message'] as String;
+      throw Exception('Request failed: $errorMessage');
+    } catch (_) {
+      throw Exception('Request failed: ${response.statusCode}');
+    }
   }
 
   /// Fetches todos with optional pagination.

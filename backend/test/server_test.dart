@@ -37,7 +37,9 @@ void main() {
       ).thenAnswer((_) async => (items: <TodoItem>[], nextPageToken: null));
 
       final request = Request(
-          'GET', Uri.parse('http://localhost${ApiConstants.todosPath}'));
+        'GET',
+        Uri.parse('http://localhost${ApiConstants.todosPath}'),
+      );
       final response = await handler(request);
 
       expect(response.statusCode, equals(200));
@@ -66,7 +68,9 @@ void main() {
       ).thenAnswer((_) async => (items: todos, nextPageToken: null));
 
       final request = Request(
-          'GET', Uri.parse('http://localhost${ApiConstants.todosPath}'));
+        'GET',
+        Uri.parse('http://localhost${ApiConstants.todosPath}'),
+      );
       final response = await handler(request);
 
       expect(response.statusCode, equals(200));

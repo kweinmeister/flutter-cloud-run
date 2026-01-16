@@ -44,11 +44,7 @@ RUN dart compile exe bin/server.dart -o bin/server
 # ------------------------------------------------------------------------------
 # Stage 3: Final Production Image
 # ------------------------------------------------------------------------------
-FROM scratch
-
-# Need CA certificates for outbound SSL (Firestore) and /tmp for temp files
-# Using cc-debian13 for Dart AOT shared libs (libc, libm, libz)
-COPY --from=gcr.io/distroless/cc-debian13 / /
+FROM gcr.io/distroless/cc-debian13
 
 WORKDIR /app
 

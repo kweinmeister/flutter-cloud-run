@@ -3,7 +3,7 @@ description: A workspace for the Full Stack Dart on Cloud Run project.
 publish_to: 'none'
 
 environment:
-  sdk: ^3.5.0
+  sdk: ^3.10.0
 
 dev_dependencies:
   melos: ^6.3.1

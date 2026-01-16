@@ -83,6 +83,13 @@ class _TodoListPageState extends State<TodoListPage> {
   };
 
   @override
+  void dispose() {
+    _client.close();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _fetchTodos();

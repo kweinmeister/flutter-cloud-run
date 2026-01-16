@@ -14,10 +14,14 @@ Handler createHandler(TodoRepository repo, {String? staticPath}) {
     ..get('/health', _healthCheck)
     ..get(ApiConstants.todosPath, (Request req) => _listTodos(req, repo))
     ..post(ApiConstants.todosPath, (Request req) => _createTodo(req, repo))
-    ..delete('${ApiConstants.todosPath}/<id>',
-        (Request req, String id) => _deleteTodo(req, id, repo))
-    ..patch('${ApiConstants.todosPath}/<id>',
-        (Request req, String id) => _updateTodo(req, id, repo));
+    ..delete(
+      '${ApiConstants.todosPath}/<id>',
+      (Request req, String id) => _deleteTodo(req, id, repo),
+    )
+    ..patch(
+      '${ApiConstants.todosPath}/<id>',
+      (Request req, String id) => _updateTodo(req, id, repo),
+    );
 
   // Create static handler if directory exists
   Handler? staticHandler;
@@ -33,14 +37,18 @@ Handler createHandler(TodoRepository repo, {String? staticPath}) {
       .addMiddleware(_errorHandler())
       .addMiddleware(_contentTypeGuard())
       .addMiddleware(_corsMiddleware())
-      .addHandler(Cascade()
-          .add(staticHandler != null
-              ? Pipeline()
-                  .addMiddleware(_staticCacheMiddleware())
-                  .addHandler(staticHandler)
-              : (Request req) => Response.notFound(null))
-          .add(router.call)
-          .handler);
+      .addHandler(
+        Cascade()
+            .add(
+              staticHandler != null
+                  ? Pipeline()
+                        .addMiddleware(_staticCacheMiddleware())
+                        .addHandler(staticHandler)
+                  : (Request req) => Response.notFound(null),
+            )
+            .add(router.call)
+            .handler,
+      );
 }
 
 Future<Response> _healthCheck(Request req) async {
@@ -64,13 +72,19 @@ Future<Response> _createTodo(Request req, TodoRepository repo) async {
 }
 
 Future<Response> _deleteTodo(
-    Request req, String id, TodoRepository repo) async {
+  Request req,
+  String id,
+  TodoRepository repo,
+) async {
   await repo.deleteTodo(id);
   return Response.ok(null);
 }
 
 Future<Response> _updateTodo(
-    Request req, String id, TodoRepository repo) async {
+  Request req,
+  String id,
+  TodoRepository repo,
+) async {
   final item = await _parseAndValidateBody(req, matchId: id);
   await repo.updateTodo(item.copyWith(id: id));
   return Response.ok(null);
@@ -79,7 +93,7 @@ Future<Response> _updateTodo(
 Future<TodoItem> _parseAndValidateBody(Request req, {String? matchId}) async {
   final bodyText = await req.readAsString();
 
-  if (bodyText.length > 100000) {
+  if (bodyText.length > ApiConstants.maxBodySizeBytes) {
     throw ValidationError('Request body too large');
   }
 
@@ -149,15 +163,13 @@ Middleware _corsMiddleware() {
         context: {'cors.origin': allowedOrigin},
       );
       final response = await innerHandler(updatedRequest);
-
-      final finalAllowedOrigin = response.context['cors.origin'] as String? ??
-          determineAllowedOrigin(null);
-
-      return response.change(headers: {
-        'Access-Control-Allow-Origin': finalAllowedOrigin,
-        'Access-Control-Allow-Methods': corsAllowMethods,
-        'Access-Control-Allow-Headers': corsAllowHeaders,
-      });
+      return response.change(
+        headers: {
+          'Access-Control-Allow-Origin': allowedOrigin,
+          'Access-Control-Allow-Methods': corsAllowMethods,
+          'Access-Control-Allow-Headers': corsAllowHeaders,
+        },
+      );
     };
   };
 }
@@ -174,16 +186,17 @@ Middleware _staticCacheMiddleware() {
       final contentType = response.headers['content-type'] ?? '';
 
       if (contentType.contains('text/html')) {
-        return response.change(headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          ...coopHeaders,
-        });
+        return response.change(
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            ...coopHeaders,
+          },
+        );
       }
 
-      return response.change(headers: {
-        'Cache-Control': 'public, max-age=604800',
-        ...coopHeaders,
-      });
+      return response.change(
+        headers: {'Cache-Control': 'public, max-age=604800', ...coopHeaders},
+      );
     },
   );
 }
@@ -199,7 +212,8 @@ Middleware _contentTypeGuard() {
           if (contentType == null ||
               !contentType.contains('application/json')) {
             return _errorResponse(
-                ValidationError('Content-Type must be application/json'));
+              ValidationError('Content-Type must be application/json'),
+            );
           }
         }
       }
@@ -217,7 +231,8 @@ Middleware _errorHandler() {
         return _errorResponse(e);
       } catch (e) {
         return _errorResponse(
-            InternalServerError('An unexpected error occurred'));
+          InternalServerError('An unexpected error occurred'),
+        );
       }
     };
   };
