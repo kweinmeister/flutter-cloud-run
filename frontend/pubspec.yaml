@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  google_fonts: ^7.0.1
+  google_fonts: ^7.0.2
   http: ^1.6.0
   json_annotation: ^4.9.0
   uuid: ^4.0.0
