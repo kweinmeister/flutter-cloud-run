@@ -12,7 +12,7 @@ updates:
     schedule:
       interval: "weekly"
 
-  # Root Dart project (Melos)
+  # Root Dart project
   - package-ecosystem: "pub"
     directory: "/"
     schedule:

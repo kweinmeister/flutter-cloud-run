@@ -22,12 +22,12 @@ To update the generated files after making changes to models:
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-Or, using the workspace-wide [Melos](../) command:
+Or, using the workspace-wide [tool/exec.dart](../tool/exec.dart) script:
 
 ```bash
-melos run generate
+dart run tool/exec.dart "dart run build_runner build --delete-conflicting-outputs"
 ```
 
 ## Integration
 
-Both the `frontend` and `backend` packages depend on this package. Due to the [Melos](../) workspace setup, they link to the local version of this package automatically.
+Both the `frontend` and `backend` packages depend on this package. Due to the [Dart Workspace](../README.md) setup, they link to the local version of this package automatically.

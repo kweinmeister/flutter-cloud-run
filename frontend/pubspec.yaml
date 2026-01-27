@@ -6,6 +6,8 @@ version: 0.1.0
 environment:
   sdk: ^3.10.0
 
+resolution: workspace
+
 dependencies:
   flutter:
     sdk: flutter
@@ -14,8 +16,8 @@ dependencies:
   http: ^1.6.0
   json_annotation: ^4.9.0
   uuid: ^4.0.0
-  shared:
-    path: ../shared
+  shared: ^1.0.0
+
 
 dev_dependencies:
   flutter_test:

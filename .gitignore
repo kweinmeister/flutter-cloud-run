@@ -44,11 +44,10 @@ coverage/
 # App Specific Build/Debug Artifacts
 backend/bin/server
 backend/server
+build_deploy/
+
 /android/app/debug
 /android/app/release
 /android/app/profile
 app.*.symbols
 app.*.map.json
-
-# Melos
-.melos_tool/

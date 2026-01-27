@@ -16,7 +16,7 @@ The frontend is a pure Flutter Web application that consumes the API provided by
 ### Prerequisites
 
 - [Flutter SDK](https://flutter.dev/docs/get-started/install) installed.
-- Dependencies installed: `flutter pub get` (or via `melos bootstrap` in the root).
+- Dependencies installed: `flutter pub get` (via root workspace).
 
 ### Running Locally
 

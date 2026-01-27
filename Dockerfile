@@ -1,48 +1,46 @@
 # ------------------------------------------------------------------------------
-# Stage 1: Build Flutter Web (Frontend)
+# Stage 1: Workspace Builder (Resolves Dependencies)
 # ------------------------------------------------------------------------------
-FROM ghcr.io/cirruslabs/flutter:stable AS flutter-builder
-
+FROM ghcr.io/cirruslabs/flutter:stable AS workspace-builder
 WORKDIR /app
 
-# Copy dependency files only to cache layers
-COPY frontend/pubspec.yaml frontend/pubspec.lock frontend/
-COPY shared/ /app/shared/
+# Copy root workspace definition
+COPY pubspec.yaml pubspec.lock ./
 
-WORKDIR /app/frontend
-# Remove local lockfile (generated on Mac) to use pure Linux resolution
-RUN rm -f pubspec.lock
+# Copy member pubspecs to allow `pub get` to verify workspace structure
+COPY backend/pubspec.yaml backend/
+COPY frontend/pubspec.yaml frontend/
+COPY shared/pubspec.yaml shared/
+
+# Install dependencies for the entire workspace
 RUN flutter pub get
 
-# Copy source code
-COPY frontend/ .
+# ------------------------------------------------------------------------------
+# Stage 2: Build Flutter Web (Frontend)
+# ------------------------------------------------------------------------------
+FROM workspace-builder AS frontend-builder
 
-# Build for web
+# Copy source code
+COPY frontend/ frontend/
+COPY shared/ shared/
+
+WORKDIR /app/frontend
 RUN flutter build web --wasm
 
 # ------------------------------------------------------------------------------
-# Stage 2: Build Dart Backend (Server)
+# Stage 3: Build Dart Backend (Server)
 # ------------------------------------------------------------------------------
-FROM dart:stable AS backend-builder
-
-WORKDIR /app
-
-# Copy dependency files only to cache layers
-COPY backend/pubspec.yaml backend/pubspec.lock backend/
-COPY shared/ /app/shared/
-
-WORKDIR /app/backend
-RUN rm -f pubspec.lock
-RUN dart pub get
+FROM workspace-builder AS backend-builder
 
 # Copy source code
-COPY backend/ .
+COPY backend/ backend/
+COPY shared/ shared/
 
-# Build server to executable (AOT)
+WORKDIR /app/backend
 RUN dart compile exe bin/server.dart -o bin/server
 
 # ------------------------------------------------------------------------------
-# Stage 3: Final Production Image
+# Stage 4: Final Production Image
 # ------------------------------------------------------------------------------
 FROM gcr.io/distroless/cc-debian13
 
@@ -52,8 +50,7 @@ WORKDIR /app
 COPY --from=backend-builder --chown=nonroot:nonroot /app/backend/bin/server /app/server
 
 # Copy the Flutter Web assets
-# We place them in a specific folder that the server will serve (e.g., /public)
-COPY --from=flutter-builder --chown=nonroot:nonroot /app/frontend/build/web /app/public
+COPY --from=frontend-builder --chown=nonroot:nonroot /app/frontend/build/web /app/public
 
 # Environment variables
 ENV PORT=8080
