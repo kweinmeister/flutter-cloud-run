@@ -23,12 +23,6 @@ void main(List<String> args) async {
     exit(1);
   }
 
-  // Naive splitting, likely sufficient for "dart analyze ." etc.
-  // For complex args, user might need to be careful with quoting.
-  final parts = command.split(' ');
-  final executable = parts.first;
-  final arguments = parts.sublist(1);
-
   // Parse root pubspec to find workspace members
   final rootPubspec = File('pubspec.yaml');
   if (!rootPubspec.existsSync()) {
@@ -90,8 +84,8 @@ void main(List<String> args) async {
 
     print('\n[$member] $command');
     final process = await Process.start(
-      executable,
-      arguments,
+      'sh',
+      ['-c', command],
       workingDirectory: dir.path,
       mode: ProcessStartMode.inheritStdio,
     );
