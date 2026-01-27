@@ -13,8 +13,9 @@ The backend acts as a trusted intermediary between the [frontend](../frontend) a
 
 ### Prerequisites
 
-- Dart SDK installed.
-- Dependencies installed: `dart pub get` (or via `melos bootstrap`).
+- Dart SDK 3.10+ installed.
+
+- Dependencies installed: `dart pub get` (via root workspace).
 
 ### Running Locally
 

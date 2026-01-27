@@ -67,8 +67,11 @@ void main(List<String> args) async {
     final repo = TodoRepository(firestoreApi, projectId);
 
     // Serve static files from /app/public (Docker) or ../frontend/build/web (Local)
+    // For OS-only deployment, we'll place it in 'public' relative to the executable
     var staticPath = '../frontend/build/web';
-    if (FileSystemEntity.isDirectorySync('/app/public')) {
+    if (FileSystemEntity.isDirectorySync('public')) {
+      staticPath = 'public';
+    } else if (FileSystemEntity.isDirectorySync('/app/public')) {
       staticPath = '/app/public';
     }
 
