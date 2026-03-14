@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:backend/repository.dart';
 import 'package:backend/src/app.dart';
 import 'package:google_cloud/google_cloud.dart';
-import 'package:googleapis/firestore/v1.dart';
+import 'package:googleapis/firestore/v1.dart' hide Pipeline;
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
